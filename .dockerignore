@@ -1,0 +1,17 @@
+.git
+.alkaid-sop
+docs
+**/.DS_Store
+**/node_modules
+**/dist
+**/.env
+**/coverage
+**/playwright-report
+**/test-results
+data
+storage
+uploads
+hls_cache
+*.md
+!frontend-user/package.json
+!frontend-user/package-lock.json
