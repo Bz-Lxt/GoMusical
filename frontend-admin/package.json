@@ -1,0 +1,6 @@
+{
+  "name": "gomusical-admin",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Admin partition; built via frontend-user Vite alias @admin"
+}

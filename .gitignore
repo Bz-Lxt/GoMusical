@@ -1,0 +1,53 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Alkaid SOP lock + docs stay in repo during build; deploy agent appends later
+# .alkaid-sop
+# docs/
+
+# Go
+backend/bin/
+backend/tmp/
+backend/coverage.out
+*.exe
+*.test
+vendor/
+
+# Node
+node_modules/
+frontend-user/dist/
+frontend-creator/dist/
+frontend-admin/dist/
+*.local
+
+# Env / secrets
+.env
+.env.local
+*.pem
+
+# Media runtime
+data/
+storage/
+uploads/
+hls_cache/
+*.flac
+*.wav
+!testdata/fixtures/**
+
+# Docker
+.docker/
+
+# Test artifacts
+test-results/
+playwright-report/
+coverage/
+/docs/
+/.alkaid-sop
+/CLAUDE.md
+/AGENTS.md
+/.cursorrules
+/.github/
