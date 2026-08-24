@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: gomusical
+      POSTGRES_PASSWORD: gomusical
+      POSTGRES_DB: gomusical
+      TZ: Asia/Shanghai
+    ports:
+      - "29473:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gomusical"]
+      interval: 5s
+      timeout: 3s
+      retries: 8
+    command: ["postgres", "-c", "timezone=Asia/Shanghai"]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "29474:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 8
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      TZ: Asia/Shanghai
+      APP_ENV: development
+      HTTP_ADDR: ":8080"
+      PUBLIC_ORIGIN: http://localhost:29471
+      CORS_ORIGINS: http://localhost:29471
+      REFERER_ALLOW: http://localhost:29471
+      DATABASE_URL: postgres://gomusical:gomusical@postgres:5432/gomusical?sslmode=disable
+      REDIS_ADDR: redis:6379
+      STORAGE_ROOT: /data/storage
+      MIGRATIONS_DIR: /app/migrations
+      PAYMENT_MODE: mock
+      MOCK_PAY_BEHAVIOR: success
+      SEED_ENABLED: "true"
+      LOG_LEVEL: info
+      HMAC_SECRET: gomusical-dev-hmac-secret-change-me-32b
+      GOPROXY: https://goproxy.cn,direct
+    ports:
+      - "29472:8080"
+    volumes:
+      - mediadata:/data/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/api/health"]
+      interval: 8s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend-user/Dockerfile
+      args:
+        VITE_API_BASE: /api
+    ports:
+      - "29471:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  mediadata:

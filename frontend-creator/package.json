@@ -1,0 +1,6 @@
+{
+  "name": "gomusical-creator",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Creator shelf source partition; built via frontend-user Vite alias @creator"
+}
