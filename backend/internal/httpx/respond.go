@@ -27,12 +27,16 @@ var envelopePool = sync.Pool{New: func() any {
 func JSON(w http.ResponseWriter, status int, data any) {
 	env := envelopePool.Get().(*Envelope)
 	*env = Envelope{OK: status < 400, Data: data}
-	envelopePool.Put(env)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(env); err != nil {
 		logx.Error("json encode failed", "err", err)
 	}
+	// Only return the envelope to the pool once we are done reading it.
+	// Putting it back earlier lets a concurrent goroutine obtain the same
+	// *Envelope via Get() and overwrite Data before this Encode finishes,
+	// which swaps response bodies between parallel requests.
+	envelopePool.Put(env)
 }
 
 func JSONRaw(w http.ResponseWriter, status int, v any) {
